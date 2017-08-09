@@ -92,6 +92,7 @@ GEM
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
     rack (1.6.8)
+    rack-cors (1.0.1)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (4.2.8)
@@ -173,6 +174,7 @@ DEPENDENCIES
   pg (~> 0.15)
   pry-rails
   quiet_assets
+  rack-cors
   rails (= 4.2.8)
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
