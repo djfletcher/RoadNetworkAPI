@@ -3,8 +3,8 @@
 # Table name: intersections
 #
 #  id         :integer          not null, primary key
-#  latitude   :decimal(, )      not null
-#  longitude  :decimal(, )      not null
+#  latitude   :decimal(10, 6)   not null
+#  longitude  :decimal(10, 6)   not null
 #  created_at :datetime
 #  updated_at :datetime
 #
