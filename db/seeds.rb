@@ -23,40 +23,40 @@ end
 
 # INTERSECTIONS
 # =================
-file = File.read('../intersections_and_endpoints_array.txt')
-points = eval(file)
-
-points.each_with_index do |point, idx|
-  longitude = point[0]
-  latitude = point[1]
-  if within_sf(latitude, longitude)
-    Intersection.create!(
-      longitude: longitude,
-      latitude: latitude
-    )
-  end
-  puts "completed point #{idx + 1} of #{points.length}" if idx % 10000 == 0
-end
+# file = File.read('../intersections_and_endpoints_array.txt')
+# points = eval(file)
+#
+# points.each_with_index do |point, idx|
+#   longitude = point[0]
+#   latitude = point[1]
+#   if within_sf(latitude, longitude)
+#     Intersection.create!(
+#       longitude: longitude,
+#       latitude: latitude
+#     )
+#   end
+#   puts "completed point #{idx + 1} of #{points.length}" if idx % 10000 == 0
+# end
 
 
 
 # ROAD EDGES
 # ================
-# file = File.read('../san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
-# roads = JSON.parse(file)['features']
-#
-# roads.each_with_index do |road, idx|
-#   intersection1, intersection2 = nil, nil
-#   road['geometry']['coordinates'].each do |coord|
-#     longitude = coord[0]
-#     latitude = coord[1]
-#     if within_sf(latitude, longitude) && is_intersection?(latitude, longitude)
-#
-#     end
-#   end
-#
-#   # Add 1 to start point and end point of each road, so that they will be counted as intersections
-#   road_start = road['geometry']['coordinates'].first
-#   road_end = road['geometry']['coordinates'].last
-#   [road_start, road_end].each { |coord| points[coord.to_s] += 1 }
-# end
+file = File.read('../san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
+roads = JSON.parse(file)['features']
+
+roads.each_with_index do |road, idx|
+  intersection1, intersection2 = nil, nil
+  road['geometry']['coordinates'].each do |coord|
+    longitude = coord[0]
+    latitude = coord[1]
+    if within_sf(latitude, longitude) && is_intersection?(latitude, longitude)
+
+    end
+  end
+
+  # Add 1 to start point and end point of each road, so that they will be counted as intersections
+  road_start = road['geometry']['coordinates'].first
+  road_end = road['geometry']['coordinates'].last
+  [road_start, road_end].each { |coord| points[coord.to_s] += 1 }
+end

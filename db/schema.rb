@@ -11,14 +11,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170810013846) do
+ActiveRecord::Schema.define(version: 20170810021039) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "intersections", force: :cascade do |t|
-    t.float    "latitude",   null: false
-    t.float    "longitude",  null: false
+    t.decimal  "latitude",   null: false
+    t.decimal  "longitude",  null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
