@@ -14,7 +14,7 @@ def within_sf(latitude, longitude)
   SOUTHWEST[0] < longitude && longitude < NORTHEAST[0]
 end
 
-file = File.read('../intersections_array_points.txt')
+file = File.read('../intersections_and_endpoints_array.txt')
 points = eval(file)
 
 points.each_with_index do |point, idx|
