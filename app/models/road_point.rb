@@ -9,4 +9,7 @@
 #
 
 class RoadPoint < ActiveRecord::Base
+
+  belongs_to :road_edge
+
 end

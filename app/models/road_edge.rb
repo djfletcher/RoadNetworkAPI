@@ -12,6 +12,8 @@
 
 class RoadEdge < ActiveRecord::Base
 
+  has_many :road_points
+
   belongs_to :intersection1,
     class_name: :Intersection,
     foreign_key: :intersection1_id,
