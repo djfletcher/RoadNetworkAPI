@@ -45,18 +45,22 @@ end
 file = File.read('../san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
 roads = JSON.parse(file)['features']
 
-roads.each_with_index do |road, idx|
-  intersection1, intersection2 = nil, nil
+roads.each_with_index do |road, road_idx|
+  prev_intersection = nil
   road['geometry']['coordinates'].each do |coord|
     longitude = coord[0]
     latitude = coord[1]
     if within_sf(latitude, longitude) && is_intersection?(latitude, longitude)
-
+      this_intersection = Intersection.where(latitude: latitude, longitude: longitude)
+      if prev_intersection
+        RoadEdge.create!(
+          intersection1_id: prev_intersection.id,
+          intersection2_id: this_intersection.id,
+          name: road['properties']['name']
+        )
+      end
+      prev_intersection = this_intersection
     end
   end
-
-  # Add 1 to start point and end point of each road, so that they will be counted as intersections
-  road_start = road['geometry']['coordinates'].first
-  road_end = road['geometry']['coordinates'].last
-  [road_start, road_end].each { |coord| points[coord.to_s] += 1 }
+  puts "Completed #{road_idx + 1} of #{roads.length}" if road_idx % 10000 == 0
 end
