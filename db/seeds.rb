@@ -17,7 +17,12 @@ def within_sf(latitude, longitude)
 end
 
 def is_intersection?(latitude, longitude)
-  Intersection.exists?(latitude: latitude, longitude: longitude)
+  if Intersection.exists?(latitude: latitude, longitude: longitude)
+    puts "yes this is an intersection"
+    true
+  else
+    false
+  end
 end
 
 
@@ -45,6 +50,27 @@ end
 file = File.read('../san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
 roads = JSON.parse(file)['features']
 
+# roads.each_with_index do |road, road_idx|
+#   prev_intersection = nil
+#   road['geometry']['coordinates'].each do |coord|
+#     longitude = coord[0]
+#     latitude = coord[1]
+#     if within_sf(latitude, longitude) && is_intersection?(latitude, longitude)
+#       this_intersection = Intersection.where(latitude: latitude, longitude: longitude).first
+#       if prev_intersection
+#         RoadEdge.create!(
+#           intersection1_id: prev_intersection.id,
+#           intersection2_id: this_intersection.id,
+#           street_name: road['properties']['name']
+#         )
+#       end
+#       prev_intersection = this_intersection
+#     end
+#   end
+#   puts "Completed #{road_idx + 1} of #{roads.length}" if road_idx % 10000 == 0
+# end
+
+count = 0
 roads.each_with_index do |road, road_idx|
   prev_intersection = nil
   road['geometry']['coordinates'].each do |coord|
@@ -53,16 +79,13 @@ roads.each_with_index do |road, road_idx|
     if within_sf(latitude, longitude) && is_intersection?(latitude, longitude)
       this_intersection = Intersection.where(latitude: latitude, longitude: longitude).first
       if prev_intersection
-        RoadEdge.create!(
-          intersection1_id: prev_intersection.id,
-          intersection2_id: this_intersection.id,
-          street_name: road['properties']['name']
-        )
+        puts "road edge created with id1 of #{prev_intersection.id} and id2 of #{this_intersection.id}"
+        count += 1
       end
       prev_intersection = this_intersection
+      puts "prev_intersection is #{prev_intersection} and this_intersection is #{this_intersection}" if count > 0
     end
+    break if count > 100
   end
   puts "Completed #{road_idx + 1} of #{roads.length}" if road_idx % 10000 == 0
 end
-
-Intersection.where(latitude: 37.7990540630213, longitude: -122.416483783565)
