@@ -47,4 +47,5 @@ group :development do
   # if you have foolishly setup a Rails 5 project,
   # 'quiet-assets' will break it (skip it!)
   gem 'quiet_assets'
+  gem 'annotate'
 end

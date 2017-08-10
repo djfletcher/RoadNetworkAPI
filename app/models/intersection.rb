@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: intersections
+#
+#  id         :integer          not null, primary key
+#  latitude   :decimal(, )      not null
+#  longitude  :decimal(, )      not null
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 class Intersection < ActiveRecord::Base
 
   # NORTHEAST = [-122.3462101020676, 37.8123578039731]
