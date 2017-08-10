@@ -49,46 +49,46 @@ end
 
 # ROAD EDGES
 # ================
-def create_road_edge(id1, id2, street_name)
-  RoadEdge.create!(
-    intersection1_id: id1,
-    intersection2_id: id2,
-    street_name: street_name
-  )
-end
+# def create_road_edge(id1, id2, street_name)
+#   RoadEdge.create!(
+#     intersection1_id: id1,
+#     intersection2_id: id2,
+#     street_name: street_name
+#   )
+# end
 
-def create_road_point(latitude, longitude, road_edge_id)
-  RoadPoint.create!(
-    latitude: latitude,
-    longitude: longitude,
-    road_edge_id: road_edge_id
-  )
-end
+# def create_road_point(latitude, longitude, road_edge_id)
+#   RoadPoint.create!(
+#     latitude: latitude,
+#     longitude: longitude,
+#     road_edge_id: road_edge_id
+#   )
+# end
 
-def connect_intersections_edges_and_roadpoints(roads)
-  roads.each_with_index do |road, road_idx|
-    prev_intersection = nil
-    roadpoints = []
-    road['geometry']['coordinates'].each do |coord|
-      longitude = coord[0].round(6)
-      latitude = coord[1].round(6)
-      if within_sf?(latitude, longitude)
-        roadpoints << coord
-        if is_intersection?(latitude, longitude)
-          this_intersection = Intersection.where(latitude: latitude, longitude: longitude).first
-          if prev_intersection
-            road_edge = create_road_edge(prev_intersection.id, this_intersection.id, road['properties']['name'])
-            roadpoints.each { |lon, lat| create_road_point(lat, lon, road_edge.id) }
-            roadpoints = []
-          end
-          prev_intersection = this_intersection
-        end
-      end
-    end
-    puts "Completed #{road_idx + 1} of #{roads.length}" if road_idx % 10000 == 0
-  end
-end
+# def connect_intersections_edges_and_roadpoints(roads)
+#   roads.each_with_index do |road, road_idx|
+#     prev_intersection = nil
+#     roadpoints = []
+#     road['geometry']['coordinates'].each do |coord|
+#       longitude = coord[0].round(6)
+#       latitude = coord[1].round(6)
+#       if within_sf?(latitude, longitude)
+#         roadpoints << coord
+#         if is_intersection?(latitude, longitude)
+#           this_intersection = Intersection.where(latitude: latitude, longitude: longitude).first
+#           if prev_intersection
+#             road_edge = create_road_edge(prev_intersection.id, this_intersection.id, road['properties']['name'])
+#             roadpoints.each { |lon, lat| create_road_point(lat, lon, road_edge.id) }
+#             roadpoints = []
+#           end
+#           prev_intersection = this_intersection
+#         end
+#       end
+#     end
+#     puts "Completed #{road_idx + 1} of #{roads.length}" if road_idx % 10000 == 0
+#   end
+# end
 
-file = File.read('../san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
-roads = JSON.parse(file)['features']
-connect_intersections_edges_and_roadpoints(roads)
+# file = File.read('../san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
+# roads = JSON.parse(file)['features']
+# connect_intersections_edges_and_roadpoints(roads)
