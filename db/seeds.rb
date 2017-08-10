@@ -51,12 +51,12 @@ roads.each_with_index do |road, road_idx|
     longitude = coord[0]
     latitude = coord[1]
     if within_sf(latitude, longitude) && is_intersection?(latitude, longitude)
-      this_intersection = Intersection.where(latitude: latitude, longitude: longitude)
+      this_intersection = Intersection.where(latitude: latitude, longitude: longitude).first
       if prev_intersection
         RoadEdge.create!(
           intersection1_id: prev_intersection.id,
           intersection2_id: this_intersection.id,
-          name: road['properties']['name']
+          street_name: road['properties']['name']
         )
       end
       prev_intersection = this_intersection
@@ -64,3 +64,5 @@ roads.each_with_index do |road, road_idx|
   end
   puts "Completed #{road_idx + 1} of #{roads.length}" if road_idx % 10000 == 0
 end
+
+Intersection.where(latitude: 37.7990540630213, longitude: -122.416483783565)
