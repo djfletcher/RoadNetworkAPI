@@ -1,7 +1,7 @@
 class IntersectionsController < ApplicationController
 
   def index
-    @intersections = Intersection.within_sf
+    @intersections = Intersection.all
     render json: @intersections
   end
 
