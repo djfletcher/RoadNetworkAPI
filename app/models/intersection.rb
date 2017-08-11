@@ -29,8 +29,4 @@ class Intersection < ActiveRecord::Base
     road_edges.map(&:intersections)
   end
 
-  def neighboring_intersections_hash
-    { 'neighbors' => neighboring_intersections }
-  end
-
 end
