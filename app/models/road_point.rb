@@ -12,4 +12,8 @@ class RoadPoint < ActiveRecord::Base
 
   belongs_to :road_edge
 
+  def intersections
+    self.road_edge.intersections
+  end
+
 end
