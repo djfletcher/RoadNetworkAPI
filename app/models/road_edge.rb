@@ -27,23 +27,16 @@ class RoadEdge < ActiveRecord::Base
     RoadEdge.offset(num_rows).limit(5000)
   end
 
-  def self.offsetted_pairs(num_rows)
+  def self.offsetted_intersection_pairs(num_rows)
     all_intersections = Intersection.all.index_by(&:id)
     RoadEdge.offsetted(num_rows).map do |edge|
       [all_intersections[edge.intersection1_id], all_intersections[edge.intersection2_id]]
     end
   end
 
-  def self.offset_pairs_by_id(num_rows)
-    RoadEdge.offset(num_rows).limit(5000).map(&:intersection_ids)
+  def self.offsetted_intersection_pairs_by_id(num_rows)
+    RoadEdge.offsetted(num_rows).map(&:intersection_ids)
   end
-
-  # def self.all_pairs
-  #   all_intersections = Intersection.find_each.index_by(&:id)
-  #   RoadEdge.find_each.map do |r|
-  #     { r.id => [all_intersections[r.intersection1_id], all_intersections[r.intersection2_id]] }
-  #   end
-  # end
 
   def intersections
     [self.intersection1, self.intersection2]
