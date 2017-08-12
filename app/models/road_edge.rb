@@ -23,12 +23,12 @@ class RoadEdge < ActiveRecord::Base
     primary_key: :id
 
 
-  def self.offset(num_rows)
+  def self.offsetted(num_rows)
     RoadEdge.offset(num_rows).limit(5000)
   end
 
-  def self.offset_pairs(num_rows)
-    RoadEdge.offset(num_rows).limit(5000).map do |edge|
+  def self.offsetted_pairs(num_rows)
+    RoadEdge.offsetted(num_rows).map do |edge|
       edge.intersections.map(&:id)
     end
   end

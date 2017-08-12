@@ -19,7 +19,7 @@ class Intersection < ActiveRecord::Base
     foreign_key: :intersection2_id,
     primary_key: :id
 
-  def self.offset(num_rows)
+  def self.offsetted(num_rows)
     Intersection.offset(num_rows).limit(5000)
   end
 
