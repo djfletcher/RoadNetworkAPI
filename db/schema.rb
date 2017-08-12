@@ -11,27 +11,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170810180756) do
+ActiveRecord::Schema.define(version: 20170812205040) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "intersections", force: :cascade do |t|
-    t.decimal  "latitude",   precision: 10, scale: 6, null: false
-    t.decimal  "longitude",  precision: 10, scale: 6, null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.decimal "latitude",  precision: 10, scale: 6, null: false
+    t.decimal "longitude", precision: 10, scale: 6, null: false
   end
 
   add_index "intersections", ["latitude"], name: "index_intersections_on_latitude", using: :btree
   add_index "intersections", ["longitude"], name: "index_intersections_on_longitude", using: :btree
 
   create_table "road_edges", force: :cascade do |t|
-    t.integer  "intersection1_id", null: false
-    t.integer  "intersection2_id", null: false
-    t.string   "street_name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.integer "intersection1_id", null: false
+    t.integer "intersection2_id", null: false
+    t.string  "street_name"
   end
 
   add_index "road_edges", ["intersection1_id"], name: "index_road_edges_on_intersection1_id", using: :btree

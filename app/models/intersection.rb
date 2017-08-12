@@ -2,11 +2,9 @@
 #
 # Table name: intersections
 #
-#  id         :integer          not null, primary key
-#  latitude   :decimal(10, 6)   not null
-#  longitude  :decimal(10, 6)   not null
-#  created_at :datetime
-#  updated_at :datetime
+#  id        :integer          not null, primary key
+#  latitude  :decimal(10, 6)   not null
+#  longitude :decimal(10, 6)   not null
 #
 
 class Intersection < ActiveRecord::Base
