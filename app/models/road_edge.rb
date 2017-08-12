@@ -25,8 +25,8 @@ class RoadEdge < ActiveRecord::Base
     primary_key: :id
 
   def self.all_pairs
-    all_intersections = Intersection.all.index_by(&:id)
-    RoadEdge.all.map do |r|
+    all_intersections = Intersection.find_each.index_by(&:id)
+    RoadEdge.find_each.map do |r|
       [all_intersections[r.intersection1_id], all_intersections[r.intersection2_id]]
     end
   end
