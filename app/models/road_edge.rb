@@ -28,9 +28,7 @@ class RoadEdge < ActiveRecord::Base
   end
 
   def self.offsetted_pairs(num_rows)
-    RoadEdge.offsetted(num_rows).map do |edge|
-      edge.intersections.map(&:id)
-    end
+    RoadEdge.offsetted(num_rows).map(&:intersections)
   end
 
   def self.offset_pairs_by_id(num_rows)
