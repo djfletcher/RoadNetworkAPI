@@ -2,23 +2,47 @@
 
 This is an API that returns road network graphs for different cities around the world. Currently only data on San Francisco streets are loaded into the database. The project is ongoing and contributions or pull requests are welcome.
 
+![San Francisco](./app/assets/images/San-Francisco-Full.png)
+
+![Grid](./app/assets/images/Grid.png =100x20)
+![Mid Range View](./app/assets/images/Mid-Range-View.png =100x20)
+
 ## API Endpoints
 
 There are currently two endpoints exposed:
 + `http://road-network-api.herokuapp.com/intersections` returns a JSON array of `intersections`.
 + `http://road-network-api.herokuapp.com/road_edges` returns a JSON array of `road_edges`.
 
-**Note that each of the above endpoints takes one parameter, an integer `$offset`, which corresponds to SQL's OFFSET command. This is due to the fact that each call returns a maximum of 5,000 rows, for performance reasons.**
+**Note that each of the above endpoints takes one parameter, an integer `$offset`, which corresponds to SQL's OFFSET command. This is due to the fact that each call returns a maximum of 5,000 rows for performance reasons.**
 
 Example using jQuery's [$.ajax method](http://api.jquery.com/jquery.ajax/):
 
 ````javascript
 $.ajax({
-    url: 'http://road-network-api.herokuapp.com/road_edges',
+    url: 'http://road-network-api.herokuapp.com/intersections',
     data: {
       '$offset': 5000
     }
   })
+
+// Returns:
+// [
+  // {
+  //   "id": 5001,
+  //   "latitude": "37.727738",
+  //   "longitude": "-122.463601"
+  // },
+  // {
+  //   "id": 5002,
+  //   "latitude": "37.728234",
+  //   "longitude": "-122.463943"
+  // },
+  // {
+  //   "id": 5003,
+  //   "latitude": "37.709892",
+  //   "longitude": "-122.456826"
+  // } ...
+// ]
 ````
 
 ## Schema
