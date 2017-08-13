@@ -4,9 +4,6 @@ This is an API that returns road network graphs for different cities around the 
 
 ![San Francisco](./app/assets/images/San-Francisco-Full.png)
 
-![Grid](./app/assets/images/Grid.png =100x20)
-![Mid Range View](./app/assets/images/Mid-Range-View.png =100x20)
-
 ## API Endpoints
 
 There are currently two endpoints exposed:
@@ -72,3 +69,8 @@ The [database](./db/schema.rb) consists of three tables: `intersections`, `road_
 ````
 
 `intersections` contains only a latitude and longitude for each intersection, which are stored as [`BigDecimal`](https://ruby-doc.org/stdlib-1.9.3/libdoc/bigdecimal/rdoc/BigDecimal.html) types. `road_edges` contain a foreign key for each of the two `intersections` connected by the edge, plus its street name. `road_points` contain a latitude and longitude for that roadpoint, plus the foreign key of the `road_edge` that it falls upon.
+
+
+
+<img src="./app/assets/images/Grid.png" width="500">
+<img src="./app/assets/images/Mid-Range-View.png" width="500">
