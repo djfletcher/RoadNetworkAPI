@@ -1,6 +1,6 @@
 # Road Network API
 
-This is an API that constructs [road network graphs](https://en.wikipedia.org/wiki/Graph_theory) for different cities around the world, and exposes them as JSON collections accessible via calls to a server-side web API. The datasets are based on the connections between shared points in road geometry compiled by [Open Street Maps](https://www.openstreetmap.org). These shared points represent intersections, each of which this API connects to its neighbors. Currently only data on San Francisco streets are loaded into the database. The project is ongoing and contributions or pull requests are welcome.
+This is an API that constructs [road network graphs](https://en.wikipedia.org/wiki/Graph_theory) for different cities around the world, and exposes them as JSON collections accessible via calls to a server-side web API. The datasets are based on the connections between shared points in road geometry compiled by [Open Street Maps](https://www.openstreetmap.org). These shared points represent intersections, each of which this API connects to adjacent intersections. Currently only data on San Francisco streets are loaded into the database. The project is ongoing and contributions or pull requests are welcome.
 
 ![San Francisco](./app/assets/images/San-Francisco-Full.png)
 *Example visualization of the API data overlaid atop a San Francisco map. Intersections are dark blue and the connections between them are green.*
