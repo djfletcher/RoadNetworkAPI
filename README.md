@@ -73,4 +73,33 @@ The [database](./db/schema.rb) consists of three tables: `intersections`, `road_
 #  road_edge_id :integer          not null
 ````
 
-`intersections` contains only a latitude and longitude for each intersection, which are stored as [`BigDecimal`](https://ruby-doc.org/stdlib-1.9.3/libdoc/bigdecimal/rdoc/BigDecimal.html) types. `road_edges` contain a foreign key for each of the two `intersections` connected by the edge, plus its street name. `road_points` contain a latitude and longitude for that roadpoint, plus the foreign key of the `road_edge` that it falls upon.
+## Constructing the Road Network
+
+The logic that constructs these road networks is based on a fundamental principle: that any two roads that intersect will share at least one exact geographic coordinate. Open Street Maps abides by [this principle](http://wiki.openstreetmap.org/wiki/Node#Nodes_on_Ways). Therefore, intersections may be extracted from a city's road system by finding the coordinates that appear more than once (i.e. the point is shared by two different roads).
+
+````ruby
+# Example finding intersections in San Francisco, from an Open Street Maps GeoJSON file
+file = File.read('san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
+roads = JSON.parse(file)['features']
+
+# Count how many times each point appears in the city's road system by storing the counts in a hash
+coord_frequencies = {}
+
+roads.each do |road|
+  road['geometry']['coordinates'].each do |coord|
+    if coord_frequencies[coord.to_s]
+      coord_frequencies[coord.to_s] += 1
+    else
+      coord_frequencies[coord.to_s] = 1
+    end
+  end
+
+  # Add 1 to start point and end point of each road, so that they will be counted as intersections
+  road_start = road['geometry']['coordinates'].first
+  road_end = road['geometry']['coordinates'].last
+  [road_start, road_end].each { |coord| coord_frequencies[coord.to_s] += 1 }
+end
+
+# Finally, extract all coordinates that appeared more than once
+intersections = coord_frequencies.select { |_, frequency| frequency > 1 }.keys
+````
