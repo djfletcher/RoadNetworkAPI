@@ -47,7 +47,68 @@ $.ajax({
 // ]
 ````
 
-## Schema
+## Constructing the Road Network
+
+The logic that constructs these road networks is based on a fundamental principle: that any two roads that intersect will share at least one exact geographic coordinate. Open Street Maps abides by [this principle](http://wiki.openstreetmap.org/wiki/Node#Nodes_on_Ways). Therefore, intersections may be extracted from a city's road system by finding the coordinates that appear more than once (i.e. the point is shared by two different roads).
+
+````ruby
+# Finding intersections in San Francisco, from an Open Street Maps GeoJSON file
+file = File.read('san-francisco_california_roads.geojson')
+roads = JSON.parse(file)['features']
+
+# Initialize hash to count how many times each coordinate appears, with a default value of 0 for each coordinate
+coord_frequencies = Hash.new { |hash, key| hash[key] = 0 }
+
+roads.each do |road|
+  road['geometry']['coordinates'].each do |coord|
+    coord_frequencies[coord.to_s] += 1
+  end
+
+  # Add 1 to start point and end point of each road, so that they will be counted as intersections
+  road_start = road['geometry']['coordinates'].first
+  road_end = road['geometry']['coordinates'].last
+  [road_start, road_end].each { |coord| coord_frequencies[coord.to_s] += 1 }
+end
+
+# Finally, extract all coordinates that appeared more than once
+intersections = coord_frequencies.select { |_, frequency| frequency > 1 }.keys
+````
+
+### Connecting Adjacent Intersections
+
+Two intersections should be connected if and only if the following two conditions are met:
+  1. They share the same road.
+  2. There are no other intersections along that road between them. Only intersections that are immediately adjacent to one another should be connected.
+
+In order to connect appropriate intersections, iterate over each road's list of coordinates and check whether that coordinate is an intersection. If it is, then connect it to the **previous** intersection that you found on that road.
+
+````ruby
+# Example using Open Street Maps GeoJSON file
+file = File.read('san-francisco_california_roads.geojson')
+roads = JSON.parse(file)['features']
+
+roads.each do |road|
+  prev_intersection = nil
+  road['geometry']['coordinates'].each do |longitude, latitude|
+    # A separate is_intersection? helper method was implemented to deal with nuanced comparisons of BigDecimal types
+    if is_intersection?(latitude, longitude)
+      this_intersection = Intersection.where(latitude: latitude, longitude: longitude).first
+      # Special condition in the case that the first coordinate on the road is an intersection, i.e. there is not yet any prev_intersection
+      if prev_intersection
+        RoadEdge.create!(
+          intersection1_id: prev_intersection.id,
+          intersection2_id: this_intersection.id,
+          street_name: road['properties']['name']
+        )
+      end
+      # Save this intersections as the new previous intersection
+      prev_intersection = this_intersection
+    end
+  end
+end
+````
+
+## Database Schema
 
 The [database](./db/schema.rb) consists of three tables: `intersections`, `road_edges`, and `road_points`. The schema for each table is as follows:
 
@@ -71,35 +132,4 @@ The [database](./db/schema.rb) consists of three tables: `intersections`, `road_
 #  latitude     :decimal(10, 6)   not null
 #  longitude    :decimal(10, 6)   not null
 #  road_edge_id :integer          not null
-````
-
-## Constructing the Road Network
-
-The logic that constructs these road networks is based on a fundamental principle: that any two roads that intersect will share at least one exact geographic coordinate. Open Street Maps abides by [this principle](http://wiki.openstreetmap.org/wiki/Node#Nodes_on_Ways). Therefore, intersections may be extracted from a city's road system by finding the coordinates that appear more than once (i.e. the point is shared by two different roads).
-
-````ruby
-# Example finding intersections in San Francisco, from an Open Street Maps GeoJSON file
-file = File.read('san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
-roads = JSON.parse(file)['features']
-
-# Count how many times each point appears in the city's road system by storing the counts in a hash
-coord_frequencies = {}
-
-roads.each do |road|
-  road['geometry']['coordinates'].each do |coord|
-    if coord_frequencies[coord.to_s]
-      coord_frequencies[coord.to_s] += 1
-    else
-      coord_frequencies[coord.to_s] = 1
-    end
-  end
-
-  # Add 1 to start point and end point of each road, so that they will be counted as intersections
-  road_start = road['geometry']['coordinates'].first
-  road_end = road['geometry']['coordinates'].last
-  [road_start, road_end].each { |coord| coord_frequencies[coord.to_s] += 1 }
-end
-
-# Finally, extract all coordinates that appeared more than once
-intersections = coord_frequencies.select { |_, frequency| frequency > 1 }.keys
 ````
