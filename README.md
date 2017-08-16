@@ -49,7 +49,7 @@ $.ajax({
 
 ## Constructing the Road Network
 
-The logic that constructs these road networks is based on a fundamental principle: that any two roads that intersect will share at least one exact geographic coordinate. Open Street Maps abides by [this principle](http://wiki.openstreetmap.org/wiki/Node#Nodes_on_Ways). Therefore, intersections may be extracted from a city's road system by finding the coordinates that appear more than once (i.e. the point is shared by two different roads).
+The logic that constructs these road networks is based on a fundamental principle: that any two intersecting roads will share at least one exact geographic coordinate. Open Street Maps abides by [this principle](http://wiki.openstreetmap.org/wiki/Node#Nodes_on_Ways). Therefore, intersections may be extracted from a city's road system by finding the coordinates that appear more than once (i.e. the point is shared by two different roads).
 
 ````ruby
 # Finding intersections in San Francisco, from an Open Street Maps GeoJSON file
@@ -110,7 +110,7 @@ end
 
 ## Database Schema
 
-The [database](./db/schema.rb) consists of three tables: `intersections`, `road_edges`, and `road_points`. The schema for each table is as follows:
+The [database](./db/schema.rb) consists of three tables: `intersections`, `road_edges`, and `road_points`. The schema for each table is structured as follows:
 
 ````ruby
 # Table name: intersections
@@ -122,8 +122,8 @@ The [database](./db/schema.rb) consists of three tables: `intersections`, `road_
 # Table name: road_edges
 # =========================
 #  id               :integer          not null, primary key
-#  intersection1_id :integer          not null
-#  intersection2_id :integer          not null
+#  intersection1_id :integer          not null, foreign key
+#  intersection2_id :integer          not null, foreign key
 #  street_name      :string
 
 # Table name: road_points
@@ -131,5 +131,5 @@ The [database](./db/schema.rb) consists of three tables: `intersections`, `road_
 #  id           :integer          not null, primary key
 #  latitude     :decimal(10, 6)   not null
 #  longitude    :decimal(10, 6)   not null
-#  road_edge_id :integer          not null
+#  road_edge_id :integer          not null, foreign key
 ````
