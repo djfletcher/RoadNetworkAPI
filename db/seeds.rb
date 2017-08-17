@@ -97,10 +97,19 @@ end
 # FINDING LENGTHS OF ROAD EDGES
 # ================
 
+include Geokit::Mappable::ClassMethods
+
 def distance(pt1, pt2)
-  Math.sqrt(
-    ((pt2[0] - pt1[0])**2 + (pt2[1] - pt1[1])**2).abs
-  ).round(6)
+  # Geokit takes latitude and longitude in reverse order
+  from = [pt1[1], pt1[0]]
+  to = [pt2[1], pt2[0]]
+  # Using #distance_between method from Geokit::Mappable module
+  distance_between(
+    from,
+    to,
+    units: :kms,
+    formula: :flat
+  )
 end
 
 def find_length_of_road_edges(roads)
@@ -115,9 +124,9 @@ def find_length_of_road_edges(roads)
         if is_intersection?(latitude, longitude)
           if prev_roadpoint
             # 1. find distance from last roadpoint to this intersection
-            lenght += distance(prev_roadpoint, this_roadpoint)
+            length += distance(prev_roadpoint, this_roadpoint)
             # 2. save the total length as the length of the road edge to roadedge with the last roadpoint's road_edge_id
-
+            roadedge = RoadEdge
             # 3. reset the total length to 0 and the prev_roadpoint to this intersection
 
           end
@@ -134,5 +143,3 @@ end
 
 # file = File.read('../../Desktop/san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
 # roads = JSON.parse(file)['features']
-
-[[-122.40673185831763, 37.655209037537475], [-122.40555596112144, 37.657999540742], [-122.40350977091872, 37.66074327292682], [-122.39568585103946, 37.666610688967296], [-122.39489057606635, 37.66743957537213], [-122.39272796122854, 37.669689529641005], [-122.3899846481389, 37.67332467722832], [-122.34282286410473, 37.50938739164721], [-122.33951025215154, 37.50736953227721], [-122.12534516617441, 37.690695417184145]].each_slice(2) { |a| puts distance(a[0],a[1]) }
