@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170812205040) do
+ActiveRecord::Schema.define(version: 20170817001048) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20170812205040) do
     t.integer "intersection1_id", null: false
     t.integer "intersection2_id", null: false
     t.string  "street_name"
+    t.float   "length"
   end
 
   add_index "road_edges", ["intersection1_id"], name: "index_road_edges_on_intersection1_id", using: :btree

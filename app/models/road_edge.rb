@@ -6,6 +6,7 @@
 #  intersection1_id :integer          not null
 #  intersection2_id :integer          not null
 #  street_name      :string
+#  length           :float
 #
 
 class RoadEdge < ActiveRecord::Base
