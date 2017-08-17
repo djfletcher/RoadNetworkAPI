@@ -92,3 +92,30 @@ end
 # file = File.read('../san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
 # roads = JSON.parse(file)['features']
 # connect_intersections_edges_and_roadpoints(roads)
+
+
+# FINDING LENGTHS OF ROAD EDGES
+# ================
+
+file = File.read('../../Desktop/san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
+roads = JSON.parse(file)['features']
+
+def add_length_to_road_edges(roads)
+  roads.each_with_index do |road, road_idx|
+    prev_roadpoint = nil
+    road['geometry']['coordinates'].each do |coord|
+      longitude = coord[0].round(6)
+      latitude = coord[1].round(6)
+      if within_sf?(latitude, longitude)
+        if is_intersection?(latitude, longitude)
+          # 1. find distance from last roadpoint to this intersection
+          # 2. save the total length as the length of the road edge to roadedge with the last roadpoint's road_edge_id
+          # 3. reset the total length to 0 and the prev_roadpoint to this intersection
+        else
+          # increment the length by the distance from the last roadpoint to this roadpoint
+        end
+      end
+    end
+    puts "Completed #{road_idx + 1} of #{roads.length}" if road_idx % 10000 == 0
+  end
+end
