@@ -16,16 +16,23 @@ def within_sf?(latitude, longitude)
   SOUTHWEST[0] < longitude && longitude < NORTHEAST[0]
 end
 
+# def is_intersection?(latitude, longitude)
+#   Intersection.exists?(latitude: latitude, longitude: longitude)
+# end
+
 def is_intersection?(latitude, longitude)
-  Intersection.exists?(latitude: latitude, longitude: longitude)
+  Intersection.exists?(
+    latitude: BigDecimal.new(latitude, 10).truncate(6),
+    longitude: BigDecimal.new(longitude, 10).truncate(6)
+  )
 end
 
-# def is_intersection?(latitude, longitude)
-#   Intersection.exists?(
-#     latitude: BigDecimal.new(latitude, 10).truncate(6),
-#     longitude: BigDecimal.new(longitude, 10).truncate(6)
-#   )
-# end
+def is_road_point?(latitude, longitude)
+  RoadPoint.exists?(
+    latitude: BigDecimal.new(latitude, 10).truncate(6),
+    longitude: BigDecimal.new(longitude, 10).truncate(6)
+  )
+end
 
 
 # INTERSECTIONS
@@ -112,6 +119,12 @@ def distance(pt1, pt2)
   )
 end
 
+def order_points_along_road_edge(road_edge)
+  intersections = road_edge.intersections
+  road_points = road_edge.road_points
+  if road_points.include?()
+end
+
 def find_length_of_road_edges(roads)
   roads.each_with_index do |road, road_idx|
     prev_roadpoint = nil
@@ -126,6 +139,14 @@ def find_length_of_road_edges(roads)
             # 1. find distance from last roadpoint to this intersection
             length += distance(prev_roadpoint, this_roadpoint)
             # 2. save the total length as the length of the road edge to roadedge with the last roadpoint's road_edge_id
+            if is_intersection?(prev_roadpoint[0], prev_roadpoint[1])
+              road_edge = prev_roadpoint.road_edges.select do |edge|
+                edge.intersection1_id == prev_roadpoint.id && edge.intersection2_id != prev_roadpoint.id ||
+                edge.intersection2_id == prev_roadpoint.id && edge.intersection1_id != prev_roadpoint.id
+              end
+            else
+              road_edge = prev_roadpoint.road_edge
+            end
             roadedge = RoadEdge
             # 3. reset the total length to 0 and the prev_roadpoint to this intersection
 
