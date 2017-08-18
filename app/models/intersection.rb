@@ -42,4 +42,8 @@ class Intersection < ActiveRecord::Base
     end
   end
 
+  def to_coordinate_hash
+    { longitude: self.longitude.to_f, latitude: self.latitude.to_f }
+  end
+
 end

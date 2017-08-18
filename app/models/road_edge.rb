@@ -40,6 +40,7 @@ class RoadEdge < ActiveRecord::Base
   end
 
   def self.edge_between_intersections(intersection1, intersection2)
+    # This method assumes both coordinates are passed in as ActiveRecord relation objects
     id1 = intersection1.id
     id2 = intersection2.id
     intersection1.road_edges.each do |edge|
@@ -53,11 +54,11 @@ class RoadEdge < ActiveRecord::Base
   end
 
   def self.edge_between_intersections_from_coordinates(raw_coord1, raw_coord2)
-    # This method assumes that both coordinates are passed in as hashes, not intersection objects
-    parsed_coord1 = RoadPoint.to_big_decimal(coord1)
-    parsed_coord2 = RoadPoint.to_big_decimal(coord2)
-    intersection1 = Intersection.where(latitude: parsed_coord1[:latitude], longitude: parsed_coord1[:longitude])
-    intersection2 = Intersection.where(latitude: parsed_coord2[:latitude], longitude: parsed_coord2[:longitude])
+    # This method assumes that both coordinates are passed in as hashes, not ActiveRecord relation objects
+    parsed_coord1 = RoadPoint.to_big_decimal(raw_coord1)
+    parsed_coord2 = RoadPoint.to_big_decimal(raw_coord2)
+    intersection1 = Intersection.where(latitude: parsed_coord1[:latitude], longitude: parsed_coord1[:longitude]).first
+    intersection2 = Intersection.where(latitude: parsed_coord2[:latitude], longitude: parsed_coord2[:longitude]).first
     raise "#{raw_coord1} is not an intersection" if intersection1.nil?
     raise "#{raw_coord2} is not an intersection" if intersection2.nil?
     RoadEdge.edge_between_intersections(intersection1, intersection2)
