@@ -52,6 +52,17 @@ class RoadEdge < ActiveRecord::Base
     nil
   end
 
+  def self.edge_between_intersections_from_coordinates(raw_coord1, raw_coord2)
+    # This method assumes that both coordinates are passed in as hashes, not intersection objects
+    parsed_coord1 = RoadPoint.to_big_decimal(coord1)
+    parsed_coord2 = RoadPoint.to_big_decimal(coord2)
+    intersection1 = Intersection.where(latitude: parsed_coord1[:latitude], longitude: parsed_coord1[:longitude])
+    intersection2 = Intersection.where(latitude: parsed_coord2[:latitude], longitude: parsed_coord2[:longitude])
+    raise "#{raw_coord1} is not an intersection" if intersection1.nil?
+    raise "#{raw_coord2} is not an intersection" if intersection2.nil?
+    RoadEdge.edge_between_intersections(intersection1, intersection2)
+  end
+
   def intersections
     [self.intersection1, self.intersection2]
   end

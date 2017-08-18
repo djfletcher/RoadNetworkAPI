@@ -12,6 +12,12 @@ class RoadPoint < ActiveRecord::Base
 
   belongs_to :road_edge
 
+  def self.to_big_decimal(coordinate)
+    lat = BigDecimal.new(coordinate[:latitude], 10).truncate(6)
+    lng = BigDecimal.new(coordinate[:longitude], 10).truncate(6)
+    { latitude: lat, longitude: lng }
+  end
+
   def intersections
     self.road_edge.intersections
   end
