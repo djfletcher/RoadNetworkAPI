@@ -119,13 +119,26 @@ def distance(pt1, pt2)
   )
 end
 
-def order_points_along_road_edge(road_edge)
-  intersections = road_edge.intersections
-  road_points = road_edge.road_points
-  if road_points.include?()
+def find_roadpoint(coordinates)
+  longitude, latitude = coordinates
+  RoadPoint.where(
+    longitude: longitude,
+    latitude: latitude
+  ).first
 end
 
-def find_length_of_road_edges(roads)
+def save_length_of_road_edge(this_roadpoint, prev_roadpoint, length)
+  # 1. save the total length as the length of the road edge to roadedge with the last roadpoint's road_edge_id
+  if is_intersection?(prev_roadpoint[1], prev_roadpoint[0])
+    road_edge = RoadEdge.edge_between(prev_roadpoint, this_roadpoint)
+  else
+    road_edge = find_roadpoint(prev_roadpoint).road_edge
+  end
+  road_edge.update_attribute(:length, length)
+end
+
+
+def find_length_of_all_road_edges(roads)
   roads.each_with_index do |road, road_idx|
     prev_roadpoint = nil
     length = 0
@@ -134,25 +147,15 @@ def find_length_of_road_edges(roads)
       latitude = coord[1].round(6)
       this_roadpoint = [longitude, latitude]
       if within_sf?(latitude, longitude)
+        length += distance(prev_roadpoint, this_roadpoint)
         if is_intersection?(latitude, longitude)
           if prev_roadpoint
-            # 1. find distance from last roadpoint to this intersection
-            length += distance(prev_roadpoint, this_roadpoint)
-            # 2. save the total length as the length of the road edge to roadedge with the last roadpoint's road_edge_id
-            if is_intersection?(prev_roadpoint[0], prev_roadpoint[1])
-              road_edge = prev_roadpoint.road_edges.select do |edge|
-
-              end
-            else
-              road_edge = prev_roadpoint.road_edge
-            end
-            roadedge = RoadEdge
-            # 3. reset the total length to 0 and the prev_roadpoint to this intersection
-
+            save_length_of_road_edge(this_roadpoint, prev_roadpoint, length)
+            # Then reset the total length to 0 and make this_roadpoint the new prev_roadpoint
+            length = 0
           end
-        else
-          # increment the length by the distance from the last roadpoint to this roadpoint
         end
+        prev_roadpoint = this_roadpoint
       end
     end
     puts "Completed #{road_idx + 1} of #{roads.length}" if road_idx % 10000 == 0

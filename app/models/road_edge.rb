@@ -39,6 +39,19 @@ class RoadEdge < ActiveRecord::Base
     RoadEdge.offsetted(num_rows).map(&:intersection_ids)
   end
 
+  def self.edge_between_intersections(intersection1, intersection2)
+    id1 = intersection1.id
+    id2 = intersection2.id
+    intersection1.road_edges.each do |edge|
+      if edge.intersection1_id == id1 && edge.intersection2_id == id2 ||
+         edge.intersection1_id == id2 && edge.intersection2_id == id1
+        return edge
+      end
+    end
+
+    nil
+  end
+
   def intersections
     [self.intersection1, self.intersection2]
   end

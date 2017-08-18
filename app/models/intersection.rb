@@ -23,19 +23,6 @@ class Intersection < ActiveRecord::Base
     Intersection.offset(num_rows).limit(5000)
   end
 
-  def self.edge_between(intersection1, intersection2)
-    id1 = intersection1.id
-    id2 = intersection2.id
-    intersection1.road_edges.each do |edge|
-      if edge.intersection1_id == id1 && edge.intersection2_id == id2 ||
-         edge.intersection1_id == id2 && edge.intersection2_id == id1
-        return edge
-      end
-    end
-
-    nil
-  end
-
   def road_edges
     self.road_edges1 + self.road_edges2
   end
