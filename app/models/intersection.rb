@@ -31,4 +31,14 @@ class Intersection < ActiveRecord::Base
     road_edges.map(&:intersections)
   end
 
+  def neighbor(road_edge)
+    if road_edge.intersection1_id == self.id
+      Intersection.find_by_id(road_edge.intersection2_id)
+    elsif road_edge.intersection2_id == self.id
+      Intersection.find_by_id(road_edge.intersection1_id)
+    else
+      raise "Intersection with id #{self.id} is not part of RoadEdge with id #{road_edge.id}"
+    end
+  end
+
 end
