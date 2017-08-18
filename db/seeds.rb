@@ -121,12 +121,14 @@ def distance(pt1, pt2)
 end
 
 def find_roadpoint(coordinate)
+  bd_coord = RoadPoint.to_big_decimal(coordinate)
   RoadPoint.where(
-    longitude: coordinate[:longitude],
-    latitude: coordinate[:latitude]
+    longitude: bd_coord[:longitude],
+    latitude: bd_coord[:latitude]
   ).first
 end
 
+problematic_border_points = 0
 def save_length_of_road_edge!(this_roadpoint, prev_roadpoint, length)
   # Separate logic to handle the case when prev_roadpoint is also an intersection
   # => i.e. you cannot simply call prev_roadpoint.road_edge
@@ -136,7 +138,14 @@ def save_length_of_road_edge!(this_roadpoint, prev_roadpoint, length)
       prev_roadpoint
     )
   else
-    road_edge = find_roadpoint(prev_roadpoint).road_edge
+    roadpoint = find_roadpoint(prev_roadpoint)
+    if roadpoint.nil?
+      # There are a very few roadpoints
+      problematic_border_points += 1
+      break
+    else
+      road_edge = roadpoint.road_edge
+    end
   end
   road_edge.update_attribute(:length, length)
 end
@@ -172,3 +181,4 @@ end
 file = File.read('../../Desktop/san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
 roads = JSON.parse(file)['features']
 find_length_of_all_road_edges(roads)
+puts "#{problematic_border_points} coordinates fell along the boundaries of SF and lost information on the length of their edges."
