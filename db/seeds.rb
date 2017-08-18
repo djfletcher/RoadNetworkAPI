@@ -107,9 +107,10 @@ end
 include Geokit::Mappable::ClassMethods
 
 def distance(pt1, pt2)
+  return 0 if pt1.nil? || pt2.nil?
   # Geokit takes latitude and longitude in reverse order
-  from = [pt1[1], pt1[0]]
-  to = [pt2[1], pt2[0]]
+  from = [pt1[:latitude], pt1[:longitude]]
+  to = [pt2[:latitude], pt2[:longitude]]
   # Using #distance_between method from Geokit::Mappable module
   distance_between(
     from,
@@ -119,41 +120,46 @@ def distance(pt1, pt2)
   )
 end
 
-def find_roadpoint(coordinates)
-  longitude, latitude = coordinates
+def find_roadpoint(coordinate)
   RoadPoint.where(
-    longitude: longitude,
-    latitude: latitude
+    longitude: coordinate[:longitude],
+    latitude: coordinate[:latitude]
   ).first
 end
 
-def save_length_of_road_edge(this_roadpoint, prev_roadpoint, length)
-  # 1. save the total length as the length of the road edge to roadedge with the last roadpoint's road_edge_id
-  if is_intersection?(prev_roadpoint[1], prev_roadpoint[0])
-    road_edge = RoadEdge.edge_between(prev_roadpoint, this_roadpoint)
+def save_length_of_road_edge!(this_roadpoint, prev_roadpoint, length)
+  # Separate logic to handle the case when prev_roadpoint is also an intersection
+  # => i.e. you cannot simply call prev_roadpoint.road_edge
+  if is_intersection?(prev_roadpoint[:latitude], prev_roadpoint[:longitude])
+    road_edge = RoadEdge.edge_between_intersection_coordinates(
+      this_roadpoint,
+      prev_roadpoint
+    )
   else
     road_edge = find_roadpoint(prev_roadpoint).road_edge
   end
   road_edge.update_attribute(:length, length)
 end
 
+def end_of_edge?(this_roadpoint, prev_roadpoint)
+  prev_roadpoint && is_intersection?(this_roadpoint[:latitude], this_roadpoint[:longitude])
+end
 
 def find_length_of_all_road_edges(roads)
   roads.each_with_index do |road, road_idx|
     prev_roadpoint = nil
     length = 0
-    road['geometry']['coordinates'].each do |coord|
-      longitude = coord[0].round(6)
-      latitude = coord[1].round(6)
-      this_roadpoint = [longitude, latitude]
-      if within_sf?(latitude, longitude)
+    road['geometry']['coordinates'].each do |longitude, latitude|
+      this_roadpoint = {
+        longitude: longitude.round(6),
+        latitude: latitude.round(6)
+      }
+      if within_sf?(this_roadpoint[:latitude], this_roadpoint[:longitude])
         length += distance(prev_roadpoint, this_roadpoint)
-        if is_intersection?(latitude, longitude)
-          if prev_roadpoint
-            save_length_of_road_edge(this_roadpoint, prev_roadpoint, length)
-            # Then reset the total length to 0 and make this_roadpoint the new prev_roadpoint
-            length = 0
-          end
+        if end_of_edge?(this_roadpoint, prev_roadpoint)
+          save_length_of_road_edge!(this_roadpoint, prev_roadpoint, length)
+          # Then reset the length to 0 for the next road edge
+          length = 0
         end
         prev_roadpoint = this_roadpoint
       end
@@ -163,6 +169,6 @@ def find_length_of_all_road_edges(roads)
 end
 
 
-
-# file = File.read('../../Desktop/san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
-# roads = JSON.parse(file)['features']
+file = File.read('../../Desktop/san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
+roads = JSON.parse(file)['features']
+find_length_of_all_road_edges(roads)
