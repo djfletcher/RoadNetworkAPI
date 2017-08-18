@@ -19,6 +19,13 @@ class Intersection < ActiveRecord::Base
     foreign_key: :intersection2_id,
     primary_key: :id
 
+  def self.within_box(northeast, southwest)
+    Intersection.where(
+      latitude: southwest[:latitude]..northeast[:latitude],
+      longitude: southwest[:longitude]..northeast[:longitude]
+    )
+  end
+
   def self.offsetted(num_rows)
     Intersection.offset(num_rows).limit(5000)
   end
