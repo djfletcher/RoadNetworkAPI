@@ -47,4 +47,9 @@ class RoadEdge < ActiveRecord::Base
     [self.intersection1_id, self.intersection2_id]
   end
 
+  def circular?
+    # A circular road edge has the same intersection at both ends
+    self.intersection1_id == self.intersection2_id
+  end
+
 end

@@ -141,8 +141,7 @@ def find_length_of_road_edges(roads)
             # 2. save the total length as the length of the road edge to roadedge with the last roadpoint's road_edge_id
             if is_intersection?(prev_roadpoint[0], prev_roadpoint[1])
               road_edge = prev_roadpoint.road_edges.select do |edge|
-                edge.intersection1_id == prev_roadpoint.id && edge.intersection2_id != prev_roadpoint.id ||
-                edge.intersection2_id == prev_roadpoint.id && edge.intersection1_id != prev_roadpoint.id
+
               end
             else
               road_edge = prev_roadpoint.road_edge
