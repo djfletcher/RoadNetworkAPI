@@ -128,8 +128,8 @@ def find_roadpoint(coordinate)
   ).first
 end
 
-problematic_border_points = 0
-def save_length_of_road_edge!(this_roadpoint, prev_roadpoint, length)
+
+def save_length_of_road_edge!(this_roadpoint, prev_roadpoint, length, problematic_border_points)
   # Separate logic to handle the case when prev_roadpoint is also an intersection
   # => i.e. you cannot simply call prev_roadpoint.road_edge
   if is_intersection?(prev_roadpoint[:latitude], prev_roadpoint[:longitude])
@@ -141,8 +141,8 @@ def save_length_of_road_edge!(this_roadpoint, prev_roadpoint, length)
     roadpoint = find_roadpoint(prev_roadpoint)
     if roadpoint.nil?
       # There are a very few roadpoints
-      problematic_border_points += 1
-      break
+      problematic_border_points[:count] += 1
+      return
     else
       road_edge = roadpoint.road_edge
     end
@@ -154,7 +154,7 @@ def end_of_edge?(this_roadpoint, prev_roadpoint)
   prev_roadpoint && is_intersection?(this_roadpoint[:latitude], this_roadpoint[:longitude])
 end
 
-def find_length_of_all_road_edges(roads)
+def find_length_of_all_road_edges(roads, problematic_border_points)
   roads.each_with_index do |road, road_idx|
     prev_roadpoint = nil
     length = 0
@@ -166,7 +166,7 @@ def find_length_of_all_road_edges(roads)
       if within_sf?(this_roadpoint[:latitude], this_roadpoint[:longitude])
         length += distance(prev_roadpoint, this_roadpoint)
         if end_of_edge?(this_roadpoint, prev_roadpoint)
-          save_length_of_road_edge!(this_roadpoint, prev_roadpoint, length)
+          save_length_of_road_edge!(this_roadpoint, prev_roadpoint, length, problematic_border_points)
           # Then reset the length to 0 for the next road edge
           length = 0
         end
@@ -175,10 +175,12 @@ def find_length_of_all_road_edges(roads)
     end
     puts "Completed #{road_idx + 1} of #{roads.length}" if road_idx % 10000 == 0
   end
+  puts "#{problematic_border_points[:count]} coordinates fell along the boundaries of SF and lost information on the length of their edges."
 end
 
 
 file = File.read('../../Desktop/san-francisco_california.imposm-geojson/san-francisco_california_roads.geojson')
 roads = JSON.parse(file)['features']
-find_length_of_all_road_edges(roads)
-puts "#{problematic_border_points} coordinates fell along the boundaries of SF and lost information on the length of their edges."
+find_length_of_all_road_edges(roads, { count: 0 })
+# First seeding script returned 21 problematic_border_points and 107 RoadEdges with length null
+# and one RoadEdge with length 0
