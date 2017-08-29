@@ -30,12 +30,36 @@ class Intersection < ActiveRecord::Base
     Intersection.offset(num_rows).limit(5000)
   end
 
+  # simple breadth first search
+  def self.path(from_id, to_id)
+    # predecessors is a hash where each key is an intersection that points
+    # to the intersection immediately before it in the search
+    predecessors = {}
+    q = Queue.new
+    q << Intersection.find_by_id(from_id)
+    until q.empty?
+      intersection = q.deq
+      # need to write helper method to extract path from predecessors hash
+      return intersection if intersection.id == to_id
+      intersection.neighboring_intersections.each do |neighbor|
+        # check whether this neighbor has already been visited
+        if !predecessors[neighbor]
+          return neighbor if intersection.id == to_id
+          predecessors[neighbor] = intersection
+          q << neighbor
+        end
+      end
+    end
+
+    raise "No path from intersection with id #{from_id} to intersection with id #{to_id}"
+  end
+
   def road_edges
     self.road_edges1 + self.road_edges2
   end
 
   def neighboring_intersections
-    road_edges.map(&:intersections)
+    road_edges.map(&:intersections).flatten.uniq(&:id)
   end
 
   def neighbor(road_edge)
