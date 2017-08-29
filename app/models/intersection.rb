@@ -40,12 +40,11 @@ class Intersection < ActiveRecord::Base
     until q.empty?
       intersection = q.deq
       # need to write helper method to extract path from predecessors hash
-      return intersection if intersection.id == to_id
       intersection.neighboring_intersections.each do |neighbor|
         # check whether this neighbor has already been visited
         if !predecessors[neighbor]
-          return neighbor if intersection.id == to_id
           predecessors[neighbor] = intersection
+          return Intersection.extract_path_as_array(neighbor, predecessors) if neighbor.id == to_id
           q << neighbor
         end
       end
@@ -75,6 +74,19 @@ class Intersection < ActiveRecord::Base
 
   def to_coordinate_hash
     { longitude: self.longitude.to_f, latitude: self.latitude.to_f }
+  end
+
+  private
+  def self.extract_path_as_array(target, predecessors)
+    path = [target]
+    current_intersection = target
+    while predecessors[current_intersection]
+      # debugger
+      path.unshift(predecessors[current_intersection])
+      current_intersection = predecessors[current_intersection]
+    end
+
+    path
   end
 
 end
